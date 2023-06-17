@@ -36,7 +36,7 @@ int blinks_time = 7;
 int dodge = 3;
 
 int num_spd[5] = {0,6, 7, 8, 9 };
-int num_dlay[5] = {0,600, 700, 800, 900};
+int num_dlay[5] = {0,860,880,900,920};
 int keep,keep2;
 bool task = false;
 
@@ -149,7 +149,7 @@ void set(){
             if(blinks > dodge){
                 display.setTextColor(SSD1306_WHITE);
               }
-             rnd = keep % 10;
+             rnd = keep % 9;
           }
       }
      else display.setTextColor(SSD1306_WHITE);
@@ -232,9 +232,9 @@ void loop() {
      for(int i =0;i<rnd;i++){
 
            
-           //digitalWrite(dirPin,HIGH);
+           digitalWrite(dirPin,HIGH);
            for(int j =0;j<200;j++){
-              digitalWrite(dirPin,LOW);
+              digitalWrite(dirPin,HIGH);
               digitalWrite(stepPin,HIGH); 
               delayMicroseconds(dlay); 
               digitalWrite(stepPin,LOW); 
@@ -336,16 +336,17 @@ void loop() {
            display.println(spd);
 
 
-           delay(1);
+           delay(2);
       }
-      /*delay(500);
-      for(int i = 0; i < 200*4 ;i++){
-          digitalWrite(stepPin,LOW); 
-          delayMicroseconds(1000); 
-          digitalWrite(stepPin,LOW); 
-          delayMicroseconds(1000);
-       
-      }*/
+      delay(500);
+      for(int i = 0; i < 200 ;i++){
+        digitalWrite(dirPin,HIGH);
+        digitalWrite(stepPin,HIGH); 
+        delayMicroseconds(1000); 
+        digitalWrite(stepPin,LOW); 
+        delayMicroseconds(1000); 
+        
+      }
       delay(2000);
       ESP.restart();
  
