@@ -21,10 +21,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
 #define button4 16
 #define button5 27
 
-
-//const int dirPin  = 16 ;
 const int stepPin = 17; 
-
+//const int dirPin = 18; 
 
 int dlay ;
 int but1,but2,but3,but4,but5;
@@ -75,7 +73,7 @@ void set(){
        //else spd = 0;
       }
      if(but2 == LOW){
-       if(spd!=1) spd--;
+       if(spd!=0) spd--;
       }
      
      if(but3 == LOW){
@@ -106,15 +104,14 @@ void setup(){
   display.display();
   display.clearDisplay();
 
-  pinMode(stepPin,OUTPUT); 
-  //pinMode(dirPin,OUTPUT);
-  
+  pinMode(stepPin,OUTPUT);
+  //pinMode(dirPin,OUTPUT);  
   pinMode(button1,INPUT);
   pinMode(button2,INPUT);
   pinMode(button3,INPUT);
   pinMode(button4,INPUT);
   pinMode(button5,INPUT);
-
+  //digitalWrite(dirPin,HIGH);
 }
      
 void loop() { 
@@ -124,25 +121,28 @@ void loop() {
         delay(100) ;
       } 
      dlay = 600+(300-(spd*100));
-     
-     for(int i =0;i<200*cycle;i++){
+     if(spd == 0){
+        dlay = 1000;
+      }
+       
+     for(int i =0;i<200*(cycle-1);i++){
         digitalWrite(stepPin,HIGH); 
         delayMicroseconds(dlay); 
         digitalWrite(stepPin,LOW); 
         delayMicroseconds(dlay);         
       }
-      delay(10);
+
+      delay(100);
+     
       for(int i =0;i<100;i++){
         delay(5);
         for(int j =0;j<2;j++){
-          digitalWrite(stepPin,HIGH); 
-          delayMicroseconds(1000); 
+          digitalWrite(stepPin,HIGH);
+          delayMicroseconds(1000);  
           digitalWrite(stepPin,LOW); 
           delayMicroseconds(1000);
           
         }
-
-         
       }
       task = false;
 }
