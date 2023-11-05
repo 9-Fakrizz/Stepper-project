@@ -2,6 +2,7 @@
 Stepper with OLED monitoring 
 
 Setup 
+0. Swap A- and B- to change direction
 1. Check your stepper motor wiring code
 2. Check MicrostepDriver about amp and micro-step
 3. Esp32,8266, OLED monitor .etc
