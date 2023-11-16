@@ -37,9 +37,9 @@ void set(){
      but3 = digitalRead(button3);
      but4 = digitalRead(button4);
      but5 = digitalRead(button5);
-     /*Serial.print("but3 : ");
-     Serial.print(but3);
-     Serial.print("  but4 : ");
+     Serial.print("but1 : ");
+     Serial.println(but1);
+    /* Serial.print("  but4 : ");
      Serial.print(but4);
      Serial.print("  but5 : ");
      Serial.println(but5);*/
@@ -118,7 +118,7 @@ void loop() {
      
      while(task == false){
         set();
-        delay(100) ;
+        delay(250) ;
       } 
      dlay = 600+(300-(spd*100));
      if(spd == 0){
@@ -132,7 +132,7 @@ void loop() {
         delayMicroseconds(dlay);         
       }
 
-      delay(100);
+     
      
       for(int i =0;i<100;i++){
         delay(5);
