@@ -38,11 +38,15 @@ void set(){
      but4 = digitalRead(button4);
      but5 = digitalRead(button5);
      Serial.print("but1 : ");
-     Serial.println(but1);
-    /* Serial.print("  but4 : ");
+     Serial.print(but1);
+     Serial.print("  but2 : ");
+     Serial.print(but2);
+     Serial.print("  but3 : ");
+     Serial.print(but3);
+     Serial.print("  but4 : ");
      Serial.print(but4);
      Serial.print("  but5 : ");
-     Serial.println(but5);*/
+     Serial.println(but5);
      display.display();
      display.clearDisplay();
 
