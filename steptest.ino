@@ -1,10 +1,14 @@
 #include <SPI.h>
 #include <Wire.h>
+#include <EEPROM.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+#define EEPROM_ADDR_SPEED 0
+#define EEPROM_ADDR_CYCLE 2
 
 // Declaration for SSD1306 display connected using software SPI (default case):
 #define OLED_MOSI   23
@@ -28,6 +32,16 @@ int dlay ;
 int but1,but2,but3,but4,but5;
 unsigned int spd,cycle = 1;
 bool task = false;
+
+void readSettingsFromEEPROM() {
+  spd = EEPROM.readShort(EEPROM_ADDR_SPEED);
+  cycle = EEPROM.readShort(EEPROM_ADDR_CYCLE);
+}
+
+void writeSettingsToEEPROM() {
+  EEPROM.writeShort(EEPROM_ADDR_SPEED, spd);
+  EEPROM.writeShort(EEPROM_ADDR_CYCLE, cycle);
+}
 
 void set(){
    
@@ -116,6 +130,9 @@ void setup(){
   pinMode(button4,INPUT);
   pinMode(button5,INPUT);
   //digitalWrite(dirPin,HIGH);
+
+  // Read settings from EEPROM during setup
+  readSettingsFromEEPROM();
 }
      
 void loop() { 
@@ -148,6 +165,10 @@ void loop() {
           
         }
       }
-      task = false;
+      but5 = digitalRead(button5);
+      if(but5 == LOW){
+        task = false;  
+      }
+      writeSettingsToEEPROM();
 }
  
