@@ -6,6 +6,7 @@
 
 EEPROMClass  SPEED("eeprom0");
 EEPROMClass  CYCLE("eeprom1");
+EEPROMClass  LAST_SPEED("eeprom2");
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -29,6 +30,8 @@ const int stepPin = 17;
 const int dirPin = 18;  //mechanical pull-low
 
 int dlay ;
+int last_dlay;
+int last_spd;
 int but1,but2,but3,but4,but5;
 uint32_t spd ;
 uint32_t cycle ;
@@ -134,23 +137,24 @@ void manual_mode(){ /////////////////////////////// Manual MODE ////////////////
      display.setTextSize(1);  
      display.setTextColor(SSD1306_BLACK, SSD1306_WHITE);
      display.setCursor(1,50);
-     display.print(F(" (BUTTON 3) EXIT    "));
+     display.print(F(" (BUTTON3) EXIT    "));
 
      
      display.setTextSize(1);  
      display.setTextColor(SSD1306_WHITE);
-     display.setCursor(3,20);
-     display.print(F("(BUTTN 1)"));
-     display.setCursor(20,35);
-     display.setTextSize(2); 
-     display.print(F("+"));
+     display.setCursor(0,20);
+     display.print(F("(BUTTN1)"));
+     display.setCursor(3,30);
+     display.setTextSize(1); 
+     display.print(F("+Step"));
 
      display.setTextSize(1);  
-     display.setCursor(65,20);
-     display.print(F("(BUTTN 2)"));
-     display.setCursor(80,35);
-     display.setTextSize(2); 
-     display.print(("-"));
+     display.setCursor(60,20);
+     display.print(F("(BUTTN2)"));
+     display.setCursor(60,30);
+     display.setTextSize(1); 
+     display.print(F("LST-SPD:"));
+     display.print(last_spd);
 
      if(but1 == LOW){
        digitalWrite(dirPin,LOW);
@@ -160,11 +164,9 @@ void manual_mode(){ /////////////////////////////// Manual MODE ////////////////
        delayMicroseconds(1000);
       }
      if(but2 == LOW){
-       digitalWrite(dirPin,HIGH);
-       digitalWrite(stepPin,HIGH);
-       delayMicroseconds(1000);  
-       digitalWrite(stepPin,LOW); 
-       delayMicroseconds(1000);
+        delay(100);
+        if(last_spd < 5){last_spd +=1;}
+        else {last_spd = 1;}
       }
      
      if(but3 == LOW){
@@ -179,13 +181,20 @@ void setup(){
   
   Serial.println("Testing EEPROMClass\n");
   if (!SPEED.begin(0x100)) {
-    Serial.println("Failed to initialise NAMES");
+    Serial.println("Failed to initialise SPEED");
     Serial.println("Restarting...");
     delay(1000);
     ESP.restart();
   }
   if (!CYCLE.begin(0x100)) {
-    Serial.println("Failed to initialise HEIGHT");
+    Serial.println("Failed to initialise CYCLE");
+    Serial.println("Restarting...");
+    delay(1000);
+    ESP.restart();
+  }
+
+   if (!LAST_SPEED.begin(0x100)) {
+    Serial.println("Failed to initialise LAST_SPEED");
     Serial.println("Restarting...");
     delay(1000);
     ESP.restart();
@@ -211,18 +220,23 @@ void setup(){
 
   SPEED.get(0, spd);
   CYCLE.get(0, cycle);
+  LAST_SPEED.get(0,last_spd);
 
   Serial.print("spd: ");   Serial.println(spd);
   Serial.print("cycle: "); Serial.println(cycle);
+  Serial.print("LAST_SPD: "); Serial.println(last_spd);
   Serial.println("------------------------------------\n");
   
-  if(spd > 10 || cycle > 12){
+  if(spd > 10 || cycle > 12 || last_spd > 10){
     spd = 1;
-    cycle = 1;  
+    cycle = 1;
+    last_spd = 1;
+      
   }
   
   Serial.print("spd: ");   Serial.println(spd);
   Serial.print("cycle: "); Serial.println(cycle);
+  Serial.print("LAST_SPD: "); Serial.println(last_spd);
   Serial.println("------------------------------------\n");
 
 }
@@ -231,7 +245,7 @@ void loop() {
 
  ReadButtons();
  //PrintButtons(); //   Uncomment this to check Buttons State via Serial Monitor !
- Serial.println("manual_mode_state : " + String(manual_mode_state));
+ //Serial.println("manual_mode_state : " + String(manual_mode_state));
  //////////////////////////////////// Check Manual Mode ///////////////////////////////
  while(manual_mode_state == true)manual_mode();
  
@@ -241,7 +255,8 @@ void loop() {
     delay(120) ;
   } 
   ///////////////////////////// set complete //////////////////////////////
- dlay = 1100 -(100 * spd);
+ dlay = 1100 -(spd * 100);
+ last_dlay = 2000 - (last_spd * 200);
  ///////////////////////////////////////// Start Spin ///////////////////////////
   if(wait == false && task == true){
              
@@ -256,9 +271,9 @@ void loop() {
      ///////////////////////////////////////// Last spin (Slow speed) ///////////////
         for(int i =0;i<800;i++){
           digitalWrite(stepPin,HIGH);
-          delayMicroseconds(1500);  
+          delayMicroseconds(last_dlay);  
           digitalWrite(stepPin,LOW); 
-          delayMicroseconds(1500);
+          delayMicroseconds(last_dlay);
         } 
   }
  //////////////////////////////////////// Check reed switch /////////////////////
@@ -284,16 +299,21 @@ void loop() {
   display.clearDisplay();
   SPEED.put(0, spd);
   SPEED.commit();
+  LAST_SPEED.put(0, last_spd);
+  LAST_SPEED.commit();
   CYCLE.put(0, cycle);
   CYCLE.commit();
 
   SPEED.get(0, spd);
+  LAST_SPEED.get(0, last_spd);
   CYCLE.get(0, cycle);
+  
 
   
-  Serial.print("spd: ");   Serial.println(spd);
-  Serial.print("cycle: "); Serial.println(cycle);
-  Serial.println("------------------------------------\n");
+//  Serial.print("spd: ");   Serial.println(spd);
+//  Serial.print("cycle: "); Serial.println(cycle);
+//  Serial.print("LAST_SPD: "); Serial.println(last_spd);
+//  Serial.println("------------------------------------\n");
   
 }
  
